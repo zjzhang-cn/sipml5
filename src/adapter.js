@@ -91,12 +91,6 @@ attachEventListener = function (video, type, listener, useCapture) {
 switch (browserDetails.browser) {
     case 'firefox': {
         console.log("This appears to be Firefox");
-
-        webrtcDetectedBrowser = "firefox";
-
-        webrtcDetectedVersion =
-            parseInt(navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1], 10);
-
         // The RTCPeerConnection object.
         var RTCPeerConnection = function (pcConfig, pcConstraints) {
             // .urls is not supported in FF yet.
@@ -190,17 +184,6 @@ switch (browserDetails.browser) {
     }
     case 'chrome': {
         console.log("This appears to be Chrome");
-
-        webrtcDetectedBrowser = "chrome";
-        // Temporary fix until crbug/374263 is fixed.
-        // Setting Chrome version to 999, if version is unavailable.
-        var result = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
-        if (result !== null) {
-            webrtcDetectedVersion = parseInt(result[2], 10);
-        } else {
-            webrtcDetectedVersion = 999;
-        }
-
         // Creates iceServer from the url for Chrome M33 and earlier.
         createIceServer = function (url, username, password) {
             var iceServer = null;
@@ -282,19 +265,81 @@ switch (browserDetails.browser) {
         };
         break;
     }
-    case 'safari': {
+    case 'edge': {
         console.log("This appears to be safari");
+        // Creates iceServer from the url for Chrome M33 and earlier.
+        createIceServer = function (url, username, password) {
+            var iceServer = null;
+            var url_parts = url.split(':');
+            if (url_parts[0].indexOf('stun') === 0) {
+                // Create iceServer with stun url.
+                iceServer = { 'url': url };
+            } else if (url_parts[0].indexOf('turn') === 0) {
+                // Chrome M28 & above uses below TURN format.
+                iceServer = {
+                    'url': url,
+                    'credential': password,
+                    'username': username
+                };
+            }
+            return iceServer;
+        };
 
-        webrtcDetectedBrowser = "safari";
-        // Temporary fix until crbug/374263 is fixed.
-        // Setting Chrome version to 999, if version is unavailable.
-        var result = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
-        if (result !== null) {
-            webrtcDetectedVersion = parseInt(result[2], 10);
-        } else {
-            webrtcDetectedVersion = 999;
+        // Creates iceServers from the urls for Chrome M34 and above.
+        createIceServers = function (urls, username, password) {
+            var iceServers = [];
+            if (webrtcDetectedVersion >= 34) {
+                // .urls is supported since Chrome M34.
+                iceServers = {
+                    'urls': urls,
+                    'credential': password,
+                    'username': username
+                };
+            } else {
+                for (i = 0; i < urls.length; i++) {
+                    var iceServer = createIceServer(urls[i],
+                        username,
+                        password);
+                    if (iceServer !== null) {
+                        iceServers.push(iceServer);
+                    }
+                }
+            }
+            return iceServers;
+        };
+
+        var getUserMedia = function () {
+            return new mediaDevices.getUserMedia(pcConfig, pcConstraints);
         }
 
+        // Attach a media stream to an element.
+        attachMediaStream = function (element, stream) {
+            if (typeof element.srcObject !== 'undefined') {
+                element.srcObject = stream;
+            } else if (typeof element.mozSrcObject !== 'undefined') {
+                element.mozSrcObject = stream;
+            } else if (typeof element.src !== 'undefined') {
+                if (stream) {
+                    element.src = URL.createObjectURL(stream);
+                }
+                else if (element.src && typeof URL.revokeObjectURL !== 'undefined') {
+                    // createObjectURL(null) -> Failed to execute 'createObjectURL' on 'URL': No function was found that matched the signature provided.
+                    URL.revokeObjectURL(element.src);
+                    element.src = null;
+                }
+            } else {
+                console.log('Error attaching stream to element.');
+            }
+            return element;
+        };
+
+        reattachMediaStream = function (to, from) {
+            to.src = from.src;
+        };
+        break;
+    } 
+    case 'safari': {
+        console.log("This appears to be safari");
         // Creates iceServer from the url for Chrome M33 and earlier.
         createIceServer = function (url, username, password) {
             var iceServer = null;
