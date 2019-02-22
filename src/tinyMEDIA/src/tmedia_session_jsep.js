@@ -464,8 +464,8 @@ tmedia_session_jsep01.onGetUserMediaSuccess = function (o_stream, _This) {
             This.o_pc.createAnswer(
                 tmedia_session_jsep01.mozThis ? tmedia_session_jsep01.onCreateSdpSuccess : function (o_offer) { tmedia_session_jsep01.onCreateSdpSuccess(o_offer, This); },
                 tmedia_session_jsep01.mozThis ? tmedia_session_jsep01.onCreateSdpError : function (s_error) { tmedia_session_jsep01.onCreateSdpError(s_error, This); },
-                This.o_media_constraints,
-                false // createProvisionalAnswer
+                This.o_media_constraints
+                // false // createProvisionalAnswer  //zhangzj 张振江修改
              );
         }
         else {
