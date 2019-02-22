@@ -13,20 +13,61 @@
 </head>
 
 <body>
-  <input type="button" class="btn btn-success" id="btnCall" value="Call" onclick='sipCall();' />
-  <input type="button" class="btn btn-success" id="btnRegister" value="HangUp" onclick='sipHangUp();' />
-  <p></p>
+  <input type="text" id="txtRealm" value="10.21.19.18" />
+  <input type="text" id="txtImpi" value="1001" />
+  <input type="password" id="txtPassword" value="1234" />
+  <input type="text" id="txtWss" value="wss://10.21.19.18:7443" />
+  <input type="button" class="btn btn-success" id="btnInit" value="初始化" onclick='sipInit();' />
+  <br/>
+  <input type="text" id="txtPhoneNumber" value="6310" />
+  <input type="button" class="btn btn-success" id="btnCall" value="呼叫" onclick='sipCall();' />
+  <input type="button" class="btn btn-success" id="btnRegister" value="挂机" onclick='sipHangUp();' />
+  <br/>
+  <div id='divKeyPad' class='span2 well div-keypad' style=" width:250; height:240;">
+    <table style="width: 100%; height: 100%">
+      <tr>
+        <td><input type="button" style="width: 33%" class="btn" value="1" onclick="sipSendDTMF('1');" /><input type="button"
+            style="width: 33%" class="btn" value="2" onclick="sipSendDTMF('2');" /><input type="button" style="width: 33%"
+            class="btn" value="3" onclick="sipSendDTMF('3');" /></td>
+      </tr>
+      <tr>
+        <td><input type="button" style="width: 33%" class="btn" value="4" onclick="sipSendDTMF('4');" /><input type="button"
+            style="width: 33%" class="btn" value="5" onclick="sipSendDTMF('5');" /><input type="button" style="width: 33%"
+            class="btn" value="6" onclick="sipSendDTMF('6');" /></td>
+      </tr>
+      <tr>
+        <td><input type="button" style="width: 33%" class="btn" value="7" onclick="sipSendDTMF('7');" /><input type="button"
+            style="width: 33%" class="btn" value="8" onclick="sipSendDTMF('8');" /><input type="button" style="width: 33%"
+            class="btn" value="9" onclick="sipSendDTMF('9');" /></td>
+      </tr>
+      <tr>
+        <td><input type="button" style="width: 33%" class="btn" value="*" onclick="sipSendDTMF('*');" /><input type="button"
+            style="width: 33%" class="btn" value="0" onclick="sipSendDTMF('0');" /><input type="button" style="width: 33%"
+            class="btn" value="#" onclick="sipSendDTMF('#');" /></td>
+      </tr>
+    </table>
+  </div>
   <audio id="audio-remote" width="0px'" height="0px" autoplay="autoplay" /></audio>
   <video id="video-remote" width="480px'" height="320px" autoplay="autoplay" />></video>
   <video id="video-local" width="80px'" height="60px" autoplay="autoplay" muted="true" /></video>
 </body>
 <script type="text/javascript">
+  function sipInit(){
+
+  }
+  function sipSendDTMF(c) {
+    if (oSipSessionCall && c) {
+      if (oSipSessionCall.dtmf(c) == 0) {
+        try { dtmfTone.play(); } catch (e) { }
+      }
+    }
+  }
   function sipCall() {
     if (oSipSessionCall) {
       oSipSessionCall.accept(oConfigCall);
     } else {
       oSipSessionCall = oSipStack.newSession('call-audiovideo', oConfigCall);
-      oSipSessionCall.call('6251');
+      oSipSessionCall.call(txtPhoneNumber.value);
     }
   }
 
@@ -52,23 +93,27 @@
       case 'terminating': case 'terminated': {
         if (e.session == oSipSessionCall) {
           oSipSessionCall = null;
-          btnCall.value = "Call"
+          btnCall.value = "呼叫"
         }
         break;
       }
 
     }
   }
-  window.onload = function () {
+  sipInit = function () {
+    var realm=txtRealm.value;
+    var impi=txtImpi.value;
+    var password=txtPassword.value;
+    var websocket_proxy_url=txtWss.value;
     SIPml.init(
       function (e) {
         oSipStack = new SIPml.Stack({
           ice_servers: "[]",
-          realm: '10.21.19.18',
-          impi: '1001',
-          impu: 'sip:1001@10.21.19.18',
-          password: '1234',
-          websocket_proxy_url: 'wss://10.21.19.18:7443',
+          realm: realm,
+          impi: impi,
+          impu: 'sip:'+impi+'@'+realm,
+          password: password,
+          websocket_proxy_url: websocket_proxy_url,
           //outbound_proxy_url: 'sip://10.21.19.18',
           sip_headers: [
             { name: 'User-Agent', value: 'IM-client/OMA1.0 sipML5-v1.2016.03.04' },
@@ -78,14 +123,14 @@
             events: '*', listener: function (e) {
               console.log(e)
               switch (e.type) {
-                case 'i_new_message':{
-                  var msg=e.newSession;
+                case 'i_new_message': {
+                  var msg = e.newSession;
                   msg.accept()
                   break
                 }
                 case 'started': {
-
-                  oSipMessage=this.newSession('message',{
+                  btnInit.disabled=true;
+                  oSipMessage = this.newSession('message', {
                     //events_listener: { events: '*', listener: onSipEventMessage }
                   });
                   oSipSessionRegister = this.newSession('register', {
@@ -102,7 +147,7 @@
                     if (e.newSession) {
                       oSipSessionCall = e.newSession;
                       oSipSessionCall.setConfiguration(oConfigCall);
-                      btnCall.value = "Accept"
+                      btnCall.value = "应答"
                     }
                   }
                   break;
