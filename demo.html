@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <!-- Le styles -->
+  <link href="./assets/css/bootstrap.css" rel="stylesheet" />
+  <script src="SIPml-api.js?svn=252" type="text/javascript"> </script>
+  <script type="text/javascript">
+    var oSipStack, oSipSessionRegister, oSipSessionCall, oSipSessionTransferCall;
+    var oSipMessage;
+  </script>
+</head>
+
+<body>
+  <input type="button" class="btn btn-success" id="btnCall" value="Call" onclick='sipCall();' />
+  <input type="button" class="btn btn-success" id="btnRegister" value="HangUp" onclick='sipHangUp();' />
+  <p></p>
+  <audio id="audio-remote" width="0px'" height="0px" autoplay="autoplay" /></audio>
+  <video id="video-remote" width="480px'" height="320px" autoplay="autoplay" />></video>
+  <video id="video-local" width="80px'" height="60px" autoplay="autoplay" muted="true" /></video>
+</body>
+<script type="text/javascript">
+  function sipCall() {
+    if (oSipSessionCall) {
+      oSipSessionCall.accept(oConfigCall);
+    } else {
+      oSipSessionCall = oSipStack.newSession('call-audiovideo', oConfigCall);
+      oSipSessionCall.call('6251');
+    }
+  }
+
+  function sipHangUp() {
+    if (oSipSessionCall) {
+      oSipSessionCall.hangup({ events_listener: { events: '*', listener: onSipEventSession } });
+    }
+  }
+
+
+  var oConfigCall = {
+    audio_remote: document.getElementById('audio-remote'),
+    video_local: document.getElementById('video-local'),
+    video_remote: document.getElementById('video-remote'),
+    events_listener: { events: '*', listener: onSipEventSession },
+  };
+  function onSipEventMessage(e /* SIPml.Session.Event */) {
+    console.log(e)
+  }
+  function onSipEventSession(e /* SIPml.Session.Event */) {
+    console.log(e)
+    switch (e.type) {
+      case 'terminating': case 'terminated': {
+        if (e.session == oSipSessionCall) {
+          oSipSessionCall = null;
+          btnCall.value = "Call"
+        }
+        break;
+      }
+
+    }
+  }
+  window.onload = function () {
+    SIPml.init(
+      function (e) {
+        oSipStack = new SIPml.Stack({
+          ice_servers: "[]",
+          realm: '10.21.19.18',
+          impi: '1001',
+          impu: 'sip:1001@10.21.19.18',
+          password: '1234',
+          websocket_proxy_url: 'wss://10.21.19.18:7443',
+          //outbound_proxy_url: 'sip://10.21.19.18',
+          sip_headers: [
+            { name: 'User-Agent', value: 'IM-client/OMA1.0 sipML5-v1.2016.03.04' },
+            { name: 'Organization', value: 'Doubango Telecom' }
+          ],
+          events_listener: {
+            events: '*', listener: function (e) {
+              console.log(e)
+              switch (e.type) {
+                case 'i_new_message':{
+                  var msg=e.newSession;
+                  msg.accept()
+                  break
+                }
+                case 'started': {
+
+                  oSipMessage=this.newSession('message',{
+                    //events_listener: { events: '*', listener: onSipEventMessage }
+                  });
+                  oSipSessionRegister = this.newSession('register', {
+                    expires: 200,
+                    events_listener: { events: '*', listener: onSipEventSession }
+                  });
+                  oSipSessionRegister.register();
+                }
+                case 'i_new_call': {
+                  if (oSipSessionCall) {
+                    // do not accept the incoming call if we're already 'in call'
+                    e.newSession.hangup(); // comment this line for multi-line support
+                  } else {
+                    if (e.newSession) {
+                      oSipSessionCall = e.newSession;
+                      oSipSessionCall.setConfiguration(oConfigCall);
+                      btnCall.value = "Accept"
+                    }
+                  }
+                  break;
+                }
+
+              }
+            }
+          }
+        });
+        oSipStack.start();
+      }
+    );
+  }
+</script>
+
+</html>
