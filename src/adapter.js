@@ -266,8 +266,7 @@ switch (browserDetails.browser) {
         break;
     }
     case 'edge': {
-        console.log("This appears to be safari");
-        // Creates iceServer from the url for Chrome M33 and earlier.
+        console.log("This appears to be edge");
         createIceServer = function (url, username, password) {
             var iceServer = null;
             var url_parts = url.split(':');
@@ -285,26 +284,12 @@ switch (browserDetails.browser) {
             return iceServer;
         };
 
-        // Creates iceServers from the urls for Chrome M34 and above.
         createIceServers = function (urls, username, password) {
-            var iceServers = [];
-            if (webrtcDetectedVersion >= 34) {
-                // .urls is supported since Chrome M34.
-                iceServers = {
+            var iceServers = {
                     'urls': urls,
                     'credential': password,
                     'username': username
                 };
-            } else {
-                for (i = 0; i < urls.length; i++) {
-                    var iceServer = createIceServer(urls[i],
-                        username,
-                        password);
-                    if (iceServer !== null) {
-                        iceServers.push(iceServer);
-                    }
-                }
-            }
             return iceServers;
         };
 
@@ -340,7 +325,7 @@ switch (browserDetails.browser) {
     } 
     case 'safari': {
         console.log("This appears to be safari");
-        // Creates iceServer from the url for Chrome M33 and earlier.
+
         createIceServer = function (url, username, password) {
             var iceServer = null;
             var url_parts = url.split(':');
@@ -360,24 +345,11 @@ switch (browserDetails.browser) {
 
         // Creates iceServers from the urls for Chrome M34 and above.
         createIceServers = function (urls, username, password) {
-            var iceServers = [];
-            if (webrtcDetectedVersion >= 34) {
-                // .urls is supported since Chrome M34.
-                iceServers = {
+            var iceServers = {
                     'urls': urls,
                     'credential': password,
                     'username': username
                 };
-            } else {
-                for (i = 0; i < urls.length; i++) {
-                    var iceServer = createIceServer(urls[i],
-                        username,
-                        password);
-                    if (iceServer !== null) {
-                        iceServers.push(iceServer);
-                    }
-                }
-            }
             return iceServers;
         };
 

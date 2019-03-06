@@ -366,7 +366,11 @@ SIPml.init = function (successCallback, errorCallback) {
         SIPml.b_have_media_stream = tsk_utils_have_stream();
         SIPml.b_webrtc_supported = tsk_utils_have_webrtc();
         SIPml.b_webrtc4all_supported = tsk_utils_have_webrtc4all();
-        SIPml.s_webrtc4all_version = tsk_utils_webrtc4all_get_version();
+        if (SIPml.b_webrtc4all_supported) {
+            SIPml.s_webrtc4all_version = tsk_utils_webrtc4all_get_version();
+        }else{
+            SIPml.s_webrtc4all_version='0.0.0.0';
+        }
         SIPml.s_navigator_friendly_name = tsk_utils_get_navigator_friendly_name();
         SIPml.s_system_friendly_name = tsk_utils_get_system_friendly_name();
 

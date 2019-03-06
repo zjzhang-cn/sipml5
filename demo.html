@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -13,15 +13,27 @@
 </head>
 
 <body>
-  <input type="text" id="txtRealm" value="10.21.19.18" />
+  <input type="text" id="txtRealm" value="sipjs.onsip.com" />
   <input type="text" id="txtImpi" value="1001" />
   <input type="password" id="txtPassword" value="1234" />
-  <input type="text" id="txtWss" value="wss://10.21.19.18:7443" />
-  <input type="button" class="btn btn-success" id="btnInit" value="初始化" onclick='sipInit();' />
+  <input type="text" id="txtWss" value="wss://edge.sip.onsip.com/" />
+  <input type="button" class="btn btn-success" id="btnInit" value="注册" onclick='sipInit();' />
   <br/>
   <input type="text" id="txtPhoneNumber" value="6310" />
-  <input type="button" class="btn btn-success" id="btnCall" value="呼叫" onclick='sipCall();' />
-  <input type="button" class="btn btn-success" id="btnRegister" value="挂机" onclick='sipHangUp();' />
+  <input type="button" class="btn btn-success" id="btnAccept" value="应答" onclick='sipAccept();' />
+  <input type="button" class="btn btn-success" id="btnCallVideo" value="呼叫Video" onclick='sipCall("call-audiovideo");' />
+  <input type="button" class="btn btn-success" id="btnCallAudio" value="呼叫Audio" onclick='sipCall("call-audio");' />
+  <input type="button" class="btn btn-success" id="btnHangUp" value="挂机" onclick='sipHangUp();' />
+  <input type="button" class="btn btn-success" id="btnMute" value="静音"  />
+  <input type="button" class="btn btn-success" id="btnHold" value="Hold"  />
+  <input type="button" class="btn btn-success" id="btnVideo" value="Enable Video" onclick='enableVideo();' />
+  <br/>
+  <input type="text" id="txtTransferNumber" value="1002" />
+  <input type="button" class="btn btn-success" id="btnTransfer" value="转移" />
+  <br/>
+  <input type="text" id="txtLayout" value="3x2" />
+  <input type="button" class="btn btn-success" id="btnLayout" value="混屏设置" onclick='meetingLayout();' />
+
   <br/>
   <div id='divKeyPad' class='span2 well div-keypad' style=" width:250; height:240;">
     <table style="width: 100%; height: 100%">
@@ -47,14 +59,11 @@
       </tr>
     </table>
   </div>
-  <audio id="audio-remote" width="0px'" height="0px" autoplay="autoplay" /></audio>
-  <video id="video-remote" width="480px'" height="320px" autoplay="autoplay" />></video>
-  <video id="video-local" width="80px'" height="60px" autoplay="autoplay" muted="true" /></video>
-</body>
-<script type="text/javascript">
-  function sipInit(){
+  <audio id="audio-remote" width="0px'" height="0px" autoplay="autoplay" ></audio>
+  <video id="video-remote" width="480px'" height="320px" autoplay="autoplay" ></video>
+  <video id="video-local" width="80px'" height="60px" autoplay="autoplay" muted="true" ></video>
 
-  }
+<script type="text/javascript">
   function sipSendDTMF(c) {
     if (oSipSessionCall && c) {
       if (oSipSessionCall.dtmf(c) == 0) {
@@ -62,13 +71,15 @@
       }
     }
   }
-  function sipCall() {
+  function sipAccept() {
     if (oSipSessionCall) {
       oSipSessionCall.accept(oConfigCall);
-    } else {
-      oSipSessionCall = oSipStack.newSession('call-audiovideo', oConfigCall);
-      oSipSessionCall.call(txtPhoneNumber.value);
     }
+  }
+
+  function sipCall(call_type) {
+      oSipSessionCall = oSipStack.newSession(call_type, oConfigCall);
+      oSipSessionCall.call(txtPhoneNumber.value);
   }
 
   function sipHangUp() {
@@ -82,6 +93,7 @@
     audio_remote: document.getElementById('audio-remote'),
     video_local: document.getElementById('video-local'),
     video_remote: document.getElementById('video-remote'),
+    enable_media_stream_cache:true,
     events_listener: { events: '*', listener: onSipEventSession },
   };
   function onSipEventMessage(e /* SIPml.Session.Event */) {
@@ -89,11 +101,11 @@
   }
   function onSipEventSession(e /* SIPml.Session.Event */) {
     console.log(e)
+    console.log(e.type)
     switch (e.type) {
       case 'terminating': case 'terminated': {
         if (e.session == oSipSessionCall) {
           oSipSessionCall = null;
-          btnCall.value = "呼叫"
         }
         break;
       }
@@ -114,6 +126,7 @@
           impu: 'sip:'+impi+'@'+realm,
           password: password,
           websocket_proxy_url: websocket_proxy_url,
+          enable_media_stream_cache: true,
           //outbound_proxy_url: 'sip://10.21.19.18',
           sip_headers: [
             { name: 'User-Agent', value: 'IM-client/OMA1.0 sipML5-v1.2016.03.04' },
@@ -138,20 +151,33 @@
                     events_listener: { events: '*', listener: onSipEventSession }
                   });
                   oSipSessionRegister.register();
+                  break;
+                }
+                case 'stopping': case 'stopped': case 'failed_to_start': case 'failed_to_stop':{
+                  break;
                 }
                 case 'i_new_call': {
                   if (oSipSessionCall) {
                     // do not accept the incoming call if we're already 'in call'
-                    e.newSession.hangup(); // comment this line for multi-line support
+                    e.newSession.hangup(oConfigCall); // comment this line for multi-line support
                   } else {
                     if (e.newSession) {
                       oSipSessionCall = e.newSession;
                       oSipSessionCall.setConfiguration(oConfigCall);
-                      btnCall.value = "应答"
+                      
                     }
                   }
                   break;
                 }
+                case 'm_permission_requested':
+                    {
+                        break;
+                    }
+                case 'm_permission_accepted':
+                case 'm_permission_refused':
+                    {
+                        break;
+                    }
 
               }
             }
@@ -162,5 +188,5 @@
     );
   }
 </script>
-
+</body>
 </html>
