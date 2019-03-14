@@ -2,9 +2,16 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta charset="utf-8" />
   <!-- Le styles -->
   <link href="./assets/css/bootstrap.css" rel="stylesheet" />
+<style type="text/css">
+body{
+      width:640px;
+}
+</style>
   <script src="SIPml-api.js?svn=252" type="text/javascript"> </script>
   <script type="text/javascript">
     var oSipStack, oSipSessionRegister, oSipSessionCall, oSipSessionTransferCall;
@@ -13,29 +20,21 @@
 </head>
 
 <body>
-  <input type="text" id="txtRealm" value="sipjs.onsip.com" />
+  <input type="text" id="txtRealm" value="10.21.19.18" />
   <input type="text" id="txtImpi" value="1001" />
-  <input type="password" id="txtPassword" value="1234" />
-  <input type="text" id="txtWss" value="wss://edge.sip.onsip.com/" />
   <input type="button" class="btn btn-success" id="btnInit" value="注册" onclick='sipInit();' />
+  <input type="hidden" id="txtPassword" value="1234"/>
+  <input type="hidden" id="txtWss" value="wss://touchiot.top/wss"/>
   <br/>
   <input type="text" id="txtPhoneNumber" value="6310" />
-  <input type="button" class="btn btn-success" id="btnAccept" value="应答" onclick='sipAccept();' />
+  <input type="button" class="btn btn-success" id="btnAccept" value="应答" onclick='sipAccept();'  disabled='true' />
   <input type="button" class="btn btn-success" id="btnCallVideo" value="呼叫Video" onclick='sipCall("call-audiovideo");' />
   <input type="button" class="btn btn-success" id="btnCallAudio" value="呼叫Audio" onclick='sipCall("call-audio");' />
-  <input type="button" class="btn btn-success" id="btnHangUp" value="挂机" onclick='sipHangUp();' />
-  <input type="button" class="btn btn-success" id="btnMute" value="静音"  />
-  <input type="button" class="btn btn-success" id="btnHold" value="Hold"  />
-  <input type="button" class="btn btn-success" id="btnVideo" value="Enable Video" onclick='enableVideo();' />
-  <br/>
-  <input type="text" id="txtTransferNumber" value="1002" />
-  <input type="button" class="btn btn-success" id="btnTransfer" value="转移" />
-  <br/>
-  <input type="text" id="txtLayout" value="3x2" />
-  <input type="button" class="btn btn-success" id="btnLayout" value="混屏设置" onclick='meetingLayout();' />
-
-  <br/>
-  <div id='divKeyPad' class='span2 well div-keypad' style=" width:250; height:240;">
+  <input type="button" class="btn btn-success" id="btnHangUp" value="挂机" onclick='sipHangUp();' disabled='true'/>
+  <audio id="audio-remote" width="0px'" height="0px" autoplay="autoplay" ></audio>
+  <video id="video-remote" width="480px'" height="320px" autoplay="autoplay" autoplay playsinline></video>
+  <video id="video-local" width="80px'" height="60px" autoplay="autoplay" muted="true" autoplay playsinline muted></video>
+  <div id='divKeyPad' class='span2 well div-keypad' style=" width:480px; height:240px;">
     <table style="width: 100%; height: 100%">
       <tr>
         <td><input type="button" style="width: 33%" class="btn" value="1" onclick="sipSendDTMF('1');" /><input type="button"
@@ -59,25 +58,34 @@
       </tr>
     </table>
   </div>
-  <audio id="audio-remote" width="0px'" height="0px" autoplay="autoplay" ></audio>
-  <video id="video-remote" width="480px'" height="320px" autoplay="autoplay" ></video>
-  <video id="video-local" width="80px'" height="60px" autoplay="autoplay" muted="true" ></video>
-
+  </div>
 <script type="text/javascript">
   function sipSendDTMF(c) {
     if (oSipSessionCall && c) {
-      if (oSipSessionCall.dtmf(c) == 0) {
-        try { dtmfTone.play(); } catch (e) { }
-      }
+      oSipSessionCall.dtmf(c)
     }
   }
   function sipAccept() {
     if (oSipSessionCall) {
+      var oConfigCall = {
+        audio_remote: document.getElementById('audio-remote'),
+        video_local: document.getElementById('video-local'),
+        video_remote: document.getElementById('video-remote'),
+        //enable_media_stream_cache:true,
+        events_listener: { events: '*', listener: onSipEventSession },
+      };
       oSipSessionCall.accept(oConfigCall);
     }
   }
 
   function sipCall(call_type) {
+      var oConfigCall = {
+        audio_remote: document.getElementById('audio-remote'),
+        video_local: document.getElementById('video-local'),
+        video_remote: document.getElementById('video-remote'),
+        //enable_media_stream_cache:true,
+        events_listener: { events: '*', listener: onSipEventSession },
+      };
       oSipSessionCall = oSipStack.newSession(call_type, oConfigCall);
       oSipSessionCall.call(txtPhoneNumber.value);
   }
@@ -89,13 +97,6 @@
   }
 
 
-  var oConfigCall = {
-    audio_remote: document.getElementById('audio-remote'),
-    video_local: document.getElementById('video-local'),
-    video_remote: document.getElementById('video-remote'),
-    enable_media_stream_cache:true,
-    events_listener: { events: '*', listener: onSipEventSession },
-  };
   function onSipEventMessage(e /* SIPml.Session.Event */) {
     console.log(e)
   }
@@ -106,10 +107,18 @@
       case 'terminating': case 'terminated': {
         if (e.session == oSipSessionCall) {
           oSipSessionCall = null;
+          btnAccept.disabled=true;
+          btnHangUp.disabled=true;
+          btnCallVideo.disabled=false;
+          btnCallAudio.disabled=false;
         }
         break;
       }
-
+     case 'connecting':{
+         btnCallVideo.disabled=true;
+         btnCallAudio.disabled=true;
+         btnHangUp.disabled=false;
+     }
     }
   }
   sipInit = function () {
@@ -120,13 +129,17 @@
     SIPml.init(
       function (e) {
         oSipStack = new SIPml.Stack({
-          ice_servers: "[]",
+          //ice_servers: "[]",
+          ice_servers: "[{urls:['turn:sub.touchiot.top:143'],url:'turn:sub.touchiot.top:143',credential:'password',username:'user'}]",
           realm: realm,
           impi: impi,
           impu: 'sip:'+impi+'@'+realm,
-          password: password,
-          websocket_proxy_url: websocket_proxy_url,
-          enable_media_stream_cache: true,
+          password: '1234',
+          //password: password,
+          websocket_proxy_url: 'wss://touchiot.top/wss',
+          //websocket_proxy_url: websocket_proxy_url,
+          //enable_media_stream_cache: true,
+          enable_rtcweb_breaker: true,
           //outbound_proxy_url: 'sip://10.21.19.18',
           sip_headers: [
             { name: 'User-Agent', value: 'IM-client/OMA1.0 sipML5-v1.2016.03.04' },
@@ -148,7 +161,7 @@
                   });
                   oSipSessionRegister = this.newSession('register', {
                     expires: 200,
-                    events_listener: { events: '*', listener: onSipEventSession }
+                    events_listener: { events: '*', listener: function(e){console.log(e)}}
                   });
                   oSipSessionRegister.register();
                   break;
@@ -164,20 +177,20 @@
                     if (e.newSession) {
                       oSipSessionCall = e.newSession;
                       oSipSessionCall.setConfiguration(oConfigCall);
-                      
+                      btnCallVideo.disabled=true;
+                      btnCallAudio.disabled=true;
+                      btnAccept.disabled=false;
+                      btnHangUp.disabled=false;
                     }
                   }
                   break;
                 }
                 case 'm_permission_requested':
-                    {
-                        break;
-                    }
                 case 'm_permission_accepted':
                 case 'm_permission_refused':
-                    {
-                        break;
-                    }
+                {
+                  break;
+                }
 
               }
             }
