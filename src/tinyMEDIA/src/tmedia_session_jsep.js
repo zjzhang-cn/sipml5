@@ -116,6 +116,7 @@ tmedia_session_jsep.prototype.__set_media_type = function (e_type) {
     if (e_type != this.e_type) {
         this.e_type = e_type;
         this.o_sdp_lo = null;
+		this.o_local_stream=null;
     }
     return 0;
 }
@@ -620,7 +621,7 @@ tmedia_session_jsep01.onSignalingstateChange = function (o_event, _This) {
 
 tmedia_session_jsep01.prototype.__get_lo = function () {
     var This = this;
-    if (!this.o_pc && !this.b_lo_held) {
+    if ((!this.o_pc && !this.b_lo_held)||(!this.b_lo_held && !this.o_local_stream)) {
         var o_video_constraints = {
             mandatory: {},
             optional: []

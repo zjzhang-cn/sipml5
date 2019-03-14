@@ -1,0 +1,16 @@
+lConfigCall = {
+    audio_remote: document.getElementById('audio-remote'),
+    video_local: null,
+    video_remote: null,
+    events_listener: { events: '*', listener: onSipEventSession },
+  };
+  
+  tmedia_type_e.AUDIO
+  
+  
+  oSipSessionCall.o_session.call(tmedia_type_e.AUDIO_VIDEO)
+  
+  
+  This.o_timerLoSdpRequest = setTimeout(function(){ __tsip_dialog_invite_timer_callback(This, This.o_timerLoSdpRequest)}, This.i_timerLoSdpRequest);
+  
+  tsk_utils_log_warn("Remote offer has not changed");
