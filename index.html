@@ -12,25 +12,30 @@
     var oSipStack, oSipSessionRegister, oSipSessionCall, oSipSessionTransferCall;
     var oSipMessage;
   </script>
+<style type="text/css">
+body{
+      width:640px;
+}
+</style>
 </head>
 
 <body>
-  <input type="text" id="txtRealm" value="10.21.19.18" />
-  <input type="text" id="txtImpi" value="1001" />
+  <div>
+  <input type="text" style="width: 25%; " id="txtRealm" value="10.21.19.18" />
+  <input type="text" style="width: 25%;" id="txtImpi" value="1001" />
   <input type="button" class="btn btn-success" id="btnInit" value="注册" onclick='sipInit();' />
   <input type="hidden" id="txtPassword" value="1234"/>
   <input type="hidden" id="txtWss" value="wss://touchiot.top/wss"/>
-  <br/>
-  <input type="text" id="txtPhoneNumber" value="6310" />
-  <input type="button" class="btn btn-success" id="btnAccept" value="应答" onclick='sipAccept();'  disabled='true' />
-  <input type="button" class="btn btn-success" id="btnCallVideo" value="呼叫Video" onclick='sipCall("call-audiovideo");' />
-  <input type="button" class="btn btn-success" id="btnCallAudio" value="呼叫Audio" onclick='sipCall("call-audio");' />
-  <input type="button" class="btn btn-success" id="btnHangUp" value="挂机" onclick='sipHangUp();' disabled='true'/>
-  <audio id="audio-remote" width="0px'" height="0px" autoplay="autoplay" ></audio>
-  <video id="video-remote" width="480px'" height="320px" autoplay="autoplay" autoplay playsinline></video>
-  <video id="video-local" width="80px'" height="60px" autoplay="autoplay" muted="true" autoplay playsinline muted></video>
-  <div id='divKeyPad' class='span2 well div-keypad' style=" width:320px; height:240px;">
+  </div>
+  <div>
+  远端<audio id="audio-remote" style="width: 25%; height: 20px" autoplay="autoplay"  controls="" autoplay></audio>
+  本地<audio id="audio-local" style="width: 25%;height: 20px" autoplay="autoplay" controls="" autoplay muted></audio>
+  </div>
+  <div id='divKeyPad' class='span2 well div-keypad' style=" width:320px; height:180px;">
     <table style="width: 100%; height: 100%">
+      <tr>
+        <td><input type="text" style="width: 100%;" id="txtPhoneNumber" value="6310" /></td>
+      </tr>
       <tr>
         <td><input type="button" style="width: 33%" class="btn" value="1" onclick="sipSendDTMF('1');" /><input type="button"
             style="width: 33%" class="btn" value="2" onclick="sipSendDTMF('2');" /><input type="button" style="width: 33%"
@@ -47,17 +52,20 @@
             class="btn" value="9" onclick="sipSendDTMF('9');" /></td>
       </tr>
       <tr>
-        <td><input type="button" style="width: 33%" class="btn" value="*" onclick="sipSendDTMF('*');" /><input type="button"
-            style="width: 33%" class="btn" value="0" onclick="sipSendDTMF('0');" /><input type="button" style="width: 33%"
-            class="btn" value="#" onclick="sipSendDTMF('#');" /></td>
+        <td>
+          <input type="button" style="width: 33%" class="btn" value="*" onclick="sipSendDTMF('*');" /><input type="button" style="width: 33%" class="btn" value="0" onclick="sipSendDTMF('0');" /><input type="button" style="width: 33%" class="btn" value="#" onclick="sipSendDTMF('#');" />
+        </td>
       <tr>
-        <td><input type="button" style="width: 25%" class="btn" value="应答" onclick='sipAccept();'  disabled='true' />
-            <input type="button" style="width: 33%" class="btn" value="0" onclick="sipSendDTMF('0');" />
-            <input type="button" style="width: 33%" class="btn" value="#" onclick="sipSendDTMF('#');" /></td>
+        <td>
+          <input type="button" style="width: 25%" class="btn" id="btnAccept" value="应答" onclick='sipAccept();'  disabled='true' /><input type="button" style="width: 25%" class="btn" id="btnCallVideo" value="视频呼叫" onclick='sipCall("call-audiovideo");' /><input type="button" style="width: 25%" class="btn" id="btnCallAudio" value="音频呼叫" onclick='sipCall("call-audio");' /><input type="button" style="width: 25%" class="btn" id="btnHangUp" value="挂机" onclick='sipHangUp();' disabled='true'/>
+          </td>
       </tr>
       </tr>
     </table>
   </div>
+  <div>
+    <video id="video-remote" width="480px'" height="320px" autoplay="autoplay" autoplay playsinline></video>
+    <video id="video-local" width="80px'" height="60px" autoplay="autoplay" muted="true" autoplay playsinline muted></video>
   </div>
 <script type="text/javascript">
   function sipSendDTMF(c) {
@@ -69,8 +77,10 @@
     if (oSipSessionCall) {
       var oConfigCall = {
         audio_remote: document.getElementById('audio-remote'),
+        audio_local: document.getElementById('audio-local'),
         video_local: document.getElementById('video-local'),
         video_remote: document.getElementById('video-remote'),
+        video_size: { minWidth: 320, minHeight: 240, maxWidth: 1024, maxHeight: 768 },
         //enable_media_stream_cache:true,
         events_listener: { events: '*', listener: onSipEventSession },
       };
@@ -81,8 +91,10 @@
   function sipCall(call_type) {
       var oConfigCall = {
         audio_remote: document.getElementById('audio-remote'),
+        audio_local: document.getElementById('audio-local'),
         video_local: document.getElementById('video-local'),
         video_remote: document.getElementById('video-remote'),
+        video_size: { minWidth: 320, minHeight: 240, maxWidth: 1024, maxHeight: 768 },
         //enable_media_stream_cache:true,
         events_listener: { events: '*', listener: onSipEventSession },
       };
