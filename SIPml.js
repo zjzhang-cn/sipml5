@@ -820,7 +820,8 @@ SIPml.Stack = function (o_conf) {
         //
 
         i_port = ((o_conf.enable_rtcweb_breaker || (window.location && window.location.protocol == "https:")) ? 10062 : 10060) + (((new Date().getTime()) % 5) * 1000);
-        s_proxy = "ns313841.ovh.net";
+        //s_proxy = "ns313841.ovh.net";
+		s_proxy = "localhost";
     }
 
     // create the stack
