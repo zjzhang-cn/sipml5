@@ -28,7 +28,7 @@
     <input type="hidden" id="txtWss" value="wss://touchiot.top/wss" />
   </div>
   <div>
-    <label id="labStatus" style="width: 25%;" >正在链接.....</label><label id="labPhone" style="width: 25%;" ></label>
+    <label id="labStatus">正在链接.....</label><label id="labPhone">空闲</label>
   </div>
   <div id='divKeyPad' class='span2 well div-keypad' style=" width:320px; height:180px;">
     <table style="width: 100%; height: 100%">
@@ -136,7 +136,7 @@
             btnHangUp.disabled = true;
             btnCallVideo.disabled = false;
             btnCallAudio.disabled = false;
-            labPhone.innerText=''
+            labPhone.innerText='空闲'
           }
           break;
         }
