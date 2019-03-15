@@ -73,6 +73,14 @@
     <video id="video-local" width="80px'" height="60px" autoplay="autoplay" muted="true" autoplay playsinline muted></video>
   </div>
   <script type="text/javascript">
+    var oConfigCall = {
+      audio_remote: document.getElementById('audio-remote'),
+      video_local: document.getElementById('video-local'),
+      video_remote: document.getElementById('video-remote'),
+      video_size: { minWidth: 320, minHeight: 240, maxWidth: 1024, maxHeight: 768 },
+      //enable_media_stream_cache:true,
+      events_listener: { events: '*', listener: onSipEventSession },
+    };
     function getQueryVariable(variable) {
       var query = window.location.search.substring(1);
       var vars = query.split("&");
@@ -90,27 +98,27 @@
     }
     function sipAccept() {
       if (oSipSessionCall) {
-        var oConfigCall = {
-          audio_remote: document.getElementById('audio-remote'),
-          video_local: document.getElementById('video-local'),
-          video_remote: document.getElementById('video-remote'),
-          video_size: { minWidth: 320, minHeight: 240, maxWidth: 1024, maxHeight: 768 },
-          //enable_media_stream_cache:true,
-          events_listener: { events: '*', listener: onSipEventSession },
-        };
+        // var oConfigCall = {
+        //   audio_remote: document.getElementById('audio-remote'),
+        //   video_local: document.getElementById('video-local'),
+        //   video_remote: document.getElementById('video-remote'),
+        //   video_size: { minWidth: 320, minHeight: 240, maxWidth: 1024, maxHeight: 768 },
+        //   //enable_media_stream_cache:true,
+        //   events_listener: { events: '*', listener: onSipEventSession },
+        // };
         oSipSessionCall.accept(oConfigCall);
       }
     }
 
     function sipCall(call_type) {
-      var oConfigCall = {
-        audio_remote: document.getElementById('audio-remote'),
-        video_local: document.getElementById('video-local'),
-        video_remote: document.getElementById('video-remote'),
-        video_size: { minWidth: 320, minHeight: 240, maxWidth: 1024, maxHeight: 768 },
-        //enable_media_stream_cache:true,
-        events_listener: { events: '*', listener: onSipEventSession },
-      };
+      // var oConfigCall = {
+      //   audio_remote: document.getElementById('audio-remote'),
+      //   video_local: document.getElementById('video-local'),
+      //   video_remote: document.getElementById('video-remote'),
+      //   video_size: { minWidth: 320, minHeight: 240, maxWidth: 1024, maxHeight: 768 },
+      //   //enable_media_stream_cache:true,
+      //   events_listener: { events: '*', listener: onSipEventSession },
+      // };
       oSipSessionCall = oSipStack.newSession(call_type, oConfigCall);
       oSipSessionCall.call(txtPhoneNumber.value);
     }
