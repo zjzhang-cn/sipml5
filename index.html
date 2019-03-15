@@ -28,7 +28,7 @@
     <input type="hidden" id="txtWss" value="wss://touchiot.top/wss" />
   </div>
   <div>
-    <label id="labStatus">正在链接.....</label><label id="labPhone"></label>
+    <label id="labStatus" style="width: 25%;" >正在链接.....</label><label id="labPhone" style="width: 25%;" ></label>
   </div>
   <div id='divKeyPad' class='span2 well div-keypad' style=" width:320px; height:180px;">
     <table style="width: 100%; height: 100%">
@@ -142,19 +142,21 @@
         }
         case 'i_ao_request': {
           labPhone.innerText=e.description;
-          break
+          break;
         }
         case 'connected':{
           btnCallVideo.disabled = true;
           btnCallAudio.disabled = true;
           btnHangUp.disabled = false;
           labPhone.innerText='<<通话中>>'
+          break;
         }
         case 'connecting': {
           btnCallVideo.disabled = true;
           btnCallAudio.disabled = true;
           btnHangUp.disabled = false;
           labPhone.innerText='<<正在呼叫>>'
+          break;
         }
       }
     }
