@@ -293,10 +293,6 @@ switch (browserDetails.browser) {
             return iceServers;
         };
 
-        var getUserMedia = function () {
-            return new mediaDevices.getUserMedia(pcConfig, pcConstraints);
-        }
-
         // Attach a media stream to an element.
         attachMediaStream = function (element, stream) {
             if (typeof element.srcObject !== 'undefined') {
@@ -322,10 +318,11 @@ switch (browserDetails.browser) {
             to.src = from.src;
         };
         break;
-    } 
+    }
     case 'safari': {
         console.log("This appears to be safari");
-
+        // getUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator);
+        // navigator.getUserMedia = getUserMedia;
         createIceServer = function (url, username, password) {
             var iceServer = null;
             var url_parts = url.split(':');
@@ -353,10 +350,7 @@ switch (browserDetails.browser) {
             return iceServers;
         };
 
-        var getUserMedia = function () {
-            return new mediaDevices.getUserMedia(pcConfig, pcConstraints);
-        }
-
+        // navigator.getUserMedia = getUserMedia;
         // Attach a media stream to an element.
         attachMediaStream = function (element, stream) {
             if (typeof element.srcObject !== 'undefined') {
@@ -382,7 +376,7 @@ switch (browserDetails.browser) {
             to.src = from.src;
         };
         break;
-    } 
+    }
     default: {
         var console = console || {
             "log": function (msg) { }
