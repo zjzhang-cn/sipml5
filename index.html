@@ -155,6 +155,7 @@
         case 'connected':{
           btnCallVideo.disabled = true;
           btnCallAudio.disabled = true;
+          btnAccept.disabled = true;
           btnHangUp.disabled = false;
           labPhone.innerText='<<通话中>>'
           break;
@@ -162,6 +163,7 @@
         case 'connecting': {
           btnCallVideo.disabled = true;
           btnCallAudio.disabled = true;
+          btnAccept.disabled = true;
           btnHangUp.disabled = false;
           labPhone.innerText='<<正在呼叫>>'
           break;
