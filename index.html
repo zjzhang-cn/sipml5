@@ -210,7 +210,7 @@
                     labStatus.innerText="<<链接成功>>";
                     btnInit.disabled = true;
                     oSipMessage = this.newSession('message', {
-                      //events_listener: { events: '*', listener: onSipEventMessage }
+                      events_listener: { events: '*', listener: onSipEventMessage }
                     });
                     oSipSessionRegister = this.newSession('register', {
                       expires: 200,
@@ -221,12 +221,12 @@
                   }
                   case 'failed_to_start': case 'failed_to_stop': {
                     labStatus.innerText="<<连接失败>>";
-                    btnInit.disabled = true;
+                    btnInit.disabled = false;
                     break;
                   }
                   case 'stopping': case 'stopped': {
                     labStatus.innerText="<<关闭连接>>";
-                    btnInit.disabled = true;
+                    btnInit.disabled = false;
                     break;
                   }
                   case 'i_new_call': {
