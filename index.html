@@ -146,7 +146,7 @@
       }
     }
     sipStackInit = function () {
-      if (!getQueryVariable('id')){
+      if (getQueryVariable('id')){
         txtImpi.value=getQueryVariable('id');
       }
       var realm = txtRealm.value;
