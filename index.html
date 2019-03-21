@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=0.75,minimum-scale-0.75,user-scalable=no" />
-  <meta http-equiv="X-UA-Compatible" content="IE=11,10" />  
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />  
+  <meta http-equiv="X-UA-Compatible" content="IE=11,10" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta http-equiv="Cache-Control" content="no-siteapp" />
   <meta charset="utf-8" />
   <!-- Le styles -->
@@ -72,7 +72,7 @@
     </table>
   </div>
   <div>
-    <audio id="audio-remote" style="width: 0; height: 0" autoplay="true" playsinline controls="controls" muted='false'></audio>
+    <audio id="audio-remote" style="width: 0; height: 0" autoplay="autoplay" autoplay playsinline controls="controls"></audio>
     <video id="video-remote" width="320px'" height="240px" autoplay="autoplay" autoplay playsinline ></video>
     <video id="video-local" width="80px'" height="60px" autoplay="autoplay" autoplay playsinline muted></video>
   </div>
@@ -164,12 +164,16 @@
           break;
         }
         case 'm_stream_audio_remote_added':{
-          e.session.audioRemote.play();
-            labPhone.innerText = '<<远端音频添加成功>>'
+          if (e.session.audioRemote){
+            e.session.audioRemote.play();
+          }
+          labPhone.innerText = '<<远端音频添加成功>>'
           break;
         }
         case 'm_stream_video_remote_added': {
-          e.session.audioRemote.play();
+          if (e.session.videoRemote){
+            e.session.videoRemote.play();
+          }
           labPhone.innerText = '<<远端视频添加成功>>'
           break;
         }
@@ -204,7 +208,7 @@
       oConfigCall = {
         audio_remote: document.getElementById('audio-remote'),
         //audio_remote: document.getElementById('video-remote'),
-        //audio_local: document.getElementById('video-local'),
+        //audio_local: document.getElementById('audio-local'),
         video_local: document.getElementById('video-local'),
         video_remote: document.getElementById('video-remote'),
         from: strFrom,
