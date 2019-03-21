@@ -216,16 +216,16 @@
       SIPml.init(
         function (e) {
           oSipStack = new SIPml.Stack({
-            //ice_servers: "[]",
-            ice_servers: "[{urls:['turn:sub.touchiot.top:143'],url:'turn:sub.touchiot.top:143',credential:'password',username:'user'}]",
+            ice_servers: "[]",
+            //ice_servers: "[{urls:['turn:sub.touchiot.top:143'],url:'turn:sub.touchiot.top:143',credential:'password',username:'user'}]",
             realm: realm,
             impi: impi,
             impu: strFrom,
             password: password,
             websocket_proxy_url: websocket_proxy_url,
-            enable_media_stream_cache: true,
-            enable_rtcweb_breaker: true,
-            outbound_proxy_url: 'sip://10.21.19.18',
+            // enable_media_stream_cache: true,
+            // enable_rtcweb_breaker: true,
+            // outbound_proxy_url: 'sip://10.21.19.18',
             sip_headers: [
               { name: 'User-Agent', value: 'sip-client/WebRTC' },
               { name: 'Organization', value: 'AsiaInfo CS' }
