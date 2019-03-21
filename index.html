@@ -220,8 +220,8 @@
       SIPml.init(
         function (e) {
           oSipStack = new SIPml.Stack({
-            ice_servers: "[]",
-            //ice_servers: "[{urls:['turn:sub.touchiot.top:143'],url:'turn:sub.touchiot.top:143',credential:'password',username:'user'}]",
+            //ice_servers: "[]",
+            ice_servers: "[{urls:['turn:sub.touchiot.top:143'],url:'turn:sub.touchiot.top:143',credential:'password',username:'user'}]",
             realm: realm,
             impi: impi,
             impu: strFrom,
