@@ -250,7 +250,7 @@
                       events_listener: { events: '*', listener: onSipEventMessage }
                     });
                     oSipSessionRegister = this.newSession('register', {
-                      expires: 300,
+                      expires: 60,
                       events_listener: {
                         events: '*', listener: function (e) {
                           console.log(e);
